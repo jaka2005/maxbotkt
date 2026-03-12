@@ -6,5 +6,5 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
 interface BotStarter {
-    fun CoroutineScope.start(bot: Bot, onUpdate: suspend (Update) -> Unit): Job
+    fun start(scope: CoroutineScope, bot: Bot, onUpdate: suspend (Update) -> Unit): Job
 }

@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 val REQUEST_DELAY = 1.seconds / 30
 
 class LongPollingStarter() : BotStarter {
-    override fun CoroutineScope.start(bot: Bot, onUpdate: suspend (Update) -> Unit): Job = launch {
+    override fun start(scope: CoroutineScope, bot: Bot, onUpdate: suspend (Update) -> Unit): Job = scope.launch {
         var marker: Marker? = null
         while (true) {
             val (updates, newMarker) = bot.getUpdates(marker = marker, limit = 100)

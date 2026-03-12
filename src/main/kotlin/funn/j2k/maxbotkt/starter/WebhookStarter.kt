@@ -30,7 +30,8 @@ class WebhookStarter(
     private val updateTypes: List<String>? = null,
     private val secret: String? = null,
 ) : BotStarter {
-    override fun CoroutineScope.start(
+    override fun start(
+        scope: CoroutineScope,
         bot: Bot,
         onUpdate: suspend (Update) -> Unit,
     ): Job {
@@ -48,7 +49,7 @@ class WebhookStarter(
             webhookModule(bot, onUpdate)
         }
 
-        return launch {
+        return scope.launch {
             server.start(wait = false)
 
             try {
