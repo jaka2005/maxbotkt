@@ -28,8 +28,6 @@ abstract class KPolymorphicSerializer<T : Any, E, out U>(
         val element = jsonDecoder.decodeJsonElement()
         val obj = element.jsonObject
 
-        println(obj)
-
         val discriminator = obj[discriminatorFieldName]
             ?.jsonPrimitive
             ?.content
