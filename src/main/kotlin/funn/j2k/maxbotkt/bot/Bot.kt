@@ -1,15 +1,14 @@
-package funn.j2k.maxbotkt
+package funn.j2k.maxbotkt.bot
 
 import funn.j2k.maxbotkt.dto.AnswerCallbackDto
 import funn.j2k.maxbotkt.dto.GetChatsDto
 import funn.j2k.maxbotkt.dto.GetUpdatesDto
 import funn.j2k.maxbotkt.dto.SendMessage
 import funn.j2k.maxbotkt.dto.SendMessageResponse
-import funn.j2k.maxbotkt.dto.SetCommandsDto
 import funn.j2k.maxbotkt.dto.SetWebhookDto
 import funn.j2k.maxbotkt.dto.SuccessResponse
 import funn.j2k.maxbotkt.dto.throwIfFailed
-import funn.j2k.maxbotkt.model.BotCommand
+import funn.j2k.maxbotkt.json
 import funn.j2k.maxbotkt.model.Marker
 import funn.j2k.maxbotkt.model.Subscription
 import funn.j2k.maxbotkt.model.chat.Chat
@@ -29,7 +28,10 @@ import io.ktor.serialization.kotlinx.json.*
 
 const val MAX_ORIGIN = "https://platform-api.max.ru/"
 
-class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
+class Bot(
+    val origin: String = MAX_ORIGIN,
+    private val token: String,
+) : IBot {
     val client = HttpClient(CIO) {
         expectSuccess = true
         install(ContentNegotiation) {
@@ -41,11 +43,11 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         }
     }
 
-    suspend fun getUpdates(
-        limit: Int = 100,
-        timeoutSeconds: Int = 30 ,
-        marker: Marker? = null,
-        types: List<UpdateType>? = null
+    override suspend fun getUpdates(
+        limit: Int,
+        timeoutSeconds: Int,
+        marker: Marker?,
+        types: List<UpdateType>?
     ): Pair<List<Update>, Marker?> {
         val response = try {
             client.get("updates") {
@@ -62,23 +64,15 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         return result.updates to result.marker
     }
 
-    suspend fun getMe(): BotInfo {
+    override suspend fun getMe(): BotInfo {
         val response = client.get("me")
 
         return response.body<BotInfo>()
     }
 
-    @Deprecated("its not working already")
-    suspend fun setCommands(commands: List<BotCommand>) {
-        client.patch("me") {
-            contentType(ContentType.Application.Json)
-            setBody(SetCommandsDto(commands))
-        }
-    }
-
-    suspend fun sendMessage(
+    override suspend fun sendMessage(
         recipient: Recipient,
-        disableLinkPreview: Boolean = false,
+        disableLinkPreview: Boolean,
         message: SendMessage,
     ): Message {
         val response = client.post("messages") {
@@ -93,7 +87,7 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         return response.body<SendMessageResponse>().message
     }
 
-    suspend fun getChat(chatId: Long): Chat {
+    override suspend fun getChat(chatId: Long): Chat {
         val response = client.get("chats") {
             url {
                 appendPathSegments(chatId.toString())
@@ -103,9 +97,9 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         return response.body()
     }
 
-    suspend fun getChats(
-        count: Int = 50,
-        marker: Marker? = null
+    override suspend fun getChats(
+        count: Int,
+        marker: Marker?
     ): Pair<List<Chat>, Marker?> {
         val response = client.get("chats") {
             parameter("count", count)
@@ -115,13 +109,13 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         return response.chats to response.marker
     }
 
-    suspend fun removeMessage(messageId: String) {
+    override suspend fun removeMessage(messageId: String) {
         client.delete("messages") {
             parameter("message_id", messageId)
         }.body<SuccessResponse>().throwIfFailed()
     }
 
-    suspend fun editMessage(messageId: String, newMessage: SendMessage) {
+    override suspend fun editMessage(messageId: String, newMessage: SendMessage) {
         client.put("messages") {
             parameter("message_id", messageId)
 
@@ -130,10 +124,10 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         }.body<SuccessResponse>().throwIfFailed()
     }
 
-    suspend fun answerCallback(
+    override suspend fun answerCallback(
         callbackId: String,
-        newMessage: SendMessage? = null,
-        notification: String? = null,
+        newMessage: SendMessage?,
+        notification: String?,
     ) {
         client.post("answers") {
             parameter("callback_id", callbackId)
@@ -142,14 +136,14 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         }.body<SuccessResponse>().throwIfFailed()
     }
 
-    suspend fun getWebhooks(): List<Subscription> {
+    override suspend fun getWebhooks(): List<Subscription> {
         return client.get("subscriptions").body()
     }
 
-    suspend fun setWebhook(
+    override suspend fun setWebhook(
         url: String,
-        updateTypes: List<String>? = null,
-        secret: String? = null,
+        updateTypes: List<String>?,
+        secret: String?,
     ) {
         client.post("subscriptions") {
             contentType(ContentType.Application.Json)
@@ -157,7 +151,7 @@ class Bot(val origin: String = MAX_ORIGIN, private val token: String) {
         }.body<SuccessResponse>().throwIfFailed()
     }
 
-    suspend fun deleteWebhook(url: String) {
+    override suspend fun deleteWebhook(url: String) {
         client.delete("subscriptions") {
             parameter("url", url)
         }.body<SuccessResponse>().throwIfFailed()

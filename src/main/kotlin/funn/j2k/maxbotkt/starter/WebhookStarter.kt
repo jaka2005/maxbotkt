@@ -1,6 +1,6 @@
 package funn.j2k.maxbotkt.starter
 
-import funn.j2k.maxbotkt.Bot
+import funn.j2k.maxbotkt.bot.Bot
 import funn.j2k.maxbotkt.exception.InvalidWebhookSecretException
 import funn.j2k.maxbotkt.json
 import funn.j2k.maxbotkt.model.update.Update
@@ -14,12 +14,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlin.time.Duration.Companion.seconds
 
 class WebhookStarter(
@@ -29,11 +24,11 @@ class WebhookStarter(
     private val publicUrl: String? = null,
     private val updateTypes: List<String>? = null,
     private val secret: String? = null,
-) : BotStarter {
+) : BotStarter<Bot> {
     override fun start(
         scope: CoroutineScope,
         bot: Bot,
-        onUpdate: suspend (Update) -> Unit,
+        onUpdate: suspend Bot.(Update) -> Unit,
     ): Job {
         val server = embeddedServer(Netty, configure = {
             connector {
@@ -63,7 +58,7 @@ class WebhookStarter(
 
     }
 
-    fun Application.webhookModule(bot: Bot, onUpdate: suspend (Update) -> Unit) {
+    fun Application.webhookModule(bot: Bot, onUpdate: suspend Bot.(Update) -> Unit) {
         publicUrl?.let { url ->
             runBlocking {
                 bot.setWebhook(url, updateTypes, secret)
@@ -88,7 +83,7 @@ class WebhookStarter(
 
                 try {
                     val update = call.receive<Update>()
-                    onUpdate(update)
+                    bot.onUpdate(update)
                     call.respond(HttpStatusCode.OK)
                 } catch (e: Exception) {
                     e.printStackTrace()

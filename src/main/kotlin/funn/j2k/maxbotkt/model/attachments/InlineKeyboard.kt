@@ -13,3 +13,5 @@ data class InlineKeyboard(
 data class InlineKeyboardPayload(
     val buttons: List<List<Button>>
 )
+
+fun InlineKeyboard(buttons: List<List<Button>>): InlineKeyboard = InlineKeyboard(InlineKeyboardPayload(buttons))
