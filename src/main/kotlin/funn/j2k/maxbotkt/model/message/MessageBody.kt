@@ -1,8 +1,8 @@
 package funn.j2k.maxbotkt.model.message
 
 import funn.j2k.maxbotkt.model.attachments.Attachment
+import funn.j2k.maxbotkt.model.markup.MarkupElement
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class MessageBody(
@@ -10,5 +10,5 @@ data class MessageBody(
     val seq: Long,
     val text: String,
     val attachments: List<Attachment>?,
-    val markup: JsonObject?,
+    val markup: List<MarkupElement>?,
 )
