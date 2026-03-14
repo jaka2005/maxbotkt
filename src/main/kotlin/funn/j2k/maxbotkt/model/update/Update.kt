@@ -1,17 +1,19 @@
 package funn.j2k.maxbotkt.model.update
 
 import funn.j2k.maxbotkt.serializers.KPolymorphicSerializer
+import funn.j2k.maxbotkt.serializers.MilliInstant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
+import kotlin.time.Instant
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable(with = KUpdateSerializer::class)
 @JsonIgnoreUnknownKeys
 sealed interface Update {
-    val timestamp: Long
+    val timestamp: MilliInstant
 }
 
 object KUpdateSerializer : KPolymorphicSerializer<Update, UpdateType, UnknowUpdate>(
@@ -25,7 +27,7 @@ object KUpdateSerializer : KPolymorphicSerializer<Update, UpdateType, UnknowUpda
         UnknowUpdate(
             raw = obj,
             type = type,
-            timestamp = timestamp
+            timestamp = Instant.fromEpochMilliseconds(timestamp)
         )
     }
 )

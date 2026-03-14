@@ -4,6 +4,7 @@ import funn.j2k.maxbotkt.model.Image
 import funn.j2k.maxbotkt.model.message.Message
 import funn.j2k.maxbotkt.model.user.ChatMember
 import funn.j2k.maxbotkt.model.user.UserWithPhoto
+import funn.j2k.maxbotkt.serializers.MilliInstant
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +14,7 @@ data class Chat(
     val status: ChatStatus,
     val title: String?,
     val icon: Image?,
-    val lastEventTime: Long,
+    val lastEventTime: MilliInstant,
     val participantsCount: Int,
     val ownerId: Long?,
     val participants: List<ChatMember>?,

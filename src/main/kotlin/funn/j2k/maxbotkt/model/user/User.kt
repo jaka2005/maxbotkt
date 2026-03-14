@@ -3,6 +3,7 @@ package funn.j2k.maxbotkt.model.user
 import funn.j2k.maxbotkt.model.BotCommand
 import funn.j2k.maxbotkt.model.chat.ChatType
 import funn.j2k.maxbotkt.model.message.Recipient
+import funn.j2k.maxbotkt.serializers.MilliInstant
 import kotlinx.serialization.Serializable
 
 sealed interface User {
@@ -11,7 +12,7 @@ sealed interface User {
     val lastName: String?
     val username: String?
     val isBot: Boolean
-    val lastActivityTime: Long?
+    val lastActivityTime: MilliInstant
     val name: String? // deprecated
 }
 
@@ -27,7 +28,7 @@ data class BasicUser(
     override val lastName: String?,
     override val username: String?,
     override val isBot: Boolean,
-    override val lastActivityTime: Long?,
+    override val lastActivityTime: MilliInstant,
     override val name: String?,
 ) : User
 
@@ -38,10 +39,11 @@ data class UserWithPhoto(
     override val lastName: String?,
     override val username: String?,
     override val isBot: Boolean,
-    override val lastActivityTime: Long?,
+    override val lastActivityTime: MilliInstant,
     override val name: String?,
 
     val avatarUrl: String?,
+    val fullAvatarUrl: String?,
     val description: String?,
 ) : User
 
@@ -52,7 +54,7 @@ data class BotInfo(
     override val lastName: String?,
     override val username: String?,
     override val isBot: Boolean,
-    override val lastActivityTime: Long?,
+    override val lastActivityTime: MilliInstant,
     override val name: String?,
 
     val description: String?,
@@ -68,12 +70,18 @@ data class ChatMember(
     override val lastName: String?,
     override val username: String?,
     override val isBot: Boolean,
-    override val lastActivityTime: Long?,
+    override val lastActivityTime: MilliInstant,
     override val name: String?,
 
-    val avatarUrl: String?,
     val description: String?,
+    val avatarUrl: String?,
+    val fullAvatarUrl: String?,
+    val lastAccessTime: MilliInstant,
 
-    val role: String?,
-    val joinedAt: Long?,
+    val isOwner: Boolean,
+    val isAdmin: Boolean,
+    val joinTime: MilliInstant,
+    val permissions: List<ChatAdminPermission>?,
+
+    val alias: String?
 ) : User
