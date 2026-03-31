@@ -97,6 +97,15 @@ class Bot(
         return response.body()
     }
 
+    override suspend fun leaveChat(chatId: Long) {
+        client.delete("chats") {
+            url {
+                appendPathSegments(chatId.toString())
+                appendPathSegments("members", "me")
+            }
+        }.body<SuccessResponse>().throwIfFailed()
+    }
+
     override suspend fun getChats(
         count: Int,
         marker: Marker?

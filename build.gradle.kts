@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "fun.j2k"
-version = "0.1.3"
+version = "0.2.0"
 
 kotlin {
     jvmToolchain(21)

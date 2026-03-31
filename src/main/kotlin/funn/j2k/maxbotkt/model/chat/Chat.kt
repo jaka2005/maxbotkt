@@ -17,7 +17,7 @@ data class Chat(
     val lastEventTime: MilliInstant,
     val participantsCount: Int,
     val ownerId: Long?,
-    val participants: List<ChatMember>?,
+    val participants: Map<String, MilliInstant>?,
     val isPublic: Boolean,
     val link: String?,
     val description: String?,

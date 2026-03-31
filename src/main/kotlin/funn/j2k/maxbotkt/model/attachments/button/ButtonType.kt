@@ -4,5 +4,6 @@ import funn.j2k.maxbotkt.serializers.PolymorphicType
 import kotlin.reflect.KClass
 
 enum class ButtonType(override val klass: KClass<out Button>) : PolymorphicType<Button> {
-    CALLBACK(CallbackButton::class)
+    CALLBACK(CallbackButton::class),
+    MESSAGE(MessageButton::class),
 }

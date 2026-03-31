@@ -6,6 +6,7 @@ import funn.j2k.maxbotkt.model.Subscription
 import funn.j2k.maxbotkt.model.TextFormat
 import funn.j2k.maxbotkt.model.attachments.Attachment
 import funn.j2k.maxbotkt.model.chat.Chat
+import funn.j2k.maxbotkt.model.chat.ChatType
 import funn.j2k.maxbotkt.model.message.Message
 import funn.j2k.maxbotkt.model.message.Recipient
 import funn.j2k.maxbotkt.model.update.Update
@@ -21,6 +22,7 @@ interface IBot {
     suspend fun removeMessage(messageId: String)
     suspend fun getChats(count: Int = 50, marker: Marker? = null): Pair<List<Chat>, Marker?>
     suspend fun getChat(chatId: Long): Chat
+    suspend fun leaveChat(chatId: Long)
     suspend fun sendMessage(recipient: Recipient, disableLinkPreview: Boolean = false, message: SendMessage): Message
     suspend fun getMe(): BotInfo
     suspend fun getUpdates(
@@ -40,6 +42,26 @@ suspend fun IBot.sendMessage(
     attachments: List<Attachment>? = null,
 ): Message = sendMessage(
     recipient = recipient,
+    disableLinkPreview = disableLinkPreview,
+    message = SendMessage(
+        text = text,
+        notify = notify,
+        format = format,
+        attachments = attachments,
+    )
+)
+
+suspend fun IBot.sendMessage(
+    text: String,
+    chatId: Long? = null,
+    userId: Long? = null,
+    disableLinkPreview: Boolean = false,
+    notify: Boolean = true,
+    format: TextFormat? = null,
+    attachments: List<Attachment>? = null,
+): Message = sendMessage(
+    // NOTE: chatType, doesnt have effect here
+    recipient = Recipient(chatId = chatId, userId = userId, chatType = ChatType.DIALOG),
     disableLinkPreview = disableLinkPreview,
     message = SendMessage(
         text = text,

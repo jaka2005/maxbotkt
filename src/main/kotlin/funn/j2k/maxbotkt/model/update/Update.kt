@@ -16,6 +16,18 @@ sealed interface Update {
     val timestamp: MilliInstant
 }
 
+val Update.fromUserId get() = when(this) {
+    is BotAddedUpdate -> this.user.userId
+    is BotRemovedUpdate -> this.user.userId
+    is BotStartedUpdate -> this.user.userId
+    is ChatTitleChangedUpdate -> this.user.userId
+    is MessageCallbackUpdate -> this.callback.user.userId
+    is MessageCreatedUpdate -> this.message.sender?.userId
+    is MessageEditedUpdate -> this.message.sender?.userId
+    is MessageRemovedUpdate -> this.userId
+    is UnknowUpdate -> null
+}
+
 object KUpdateSerializer : KPolymorphicSerializer<Update, UpdateType, UnknowUpdate>(
     types = UpdateType.entries,
     discriminatorFieldName = "update_type",
