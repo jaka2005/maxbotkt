@@ -25,6 +25,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlin.time.Duration.Companion.seconds
 
 const val MAX_ORIGIN = "https://platform-api.max.ru/"
 
@@ -51,6 +52,10 @@ class Bot(
     ): Pair<List<Update>, Marker?> {
         val response = try {
             client.get("updates") {
+                timeout {
+                    connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+                    requestTimeoutMillis = (timeoutSeconds + 5).seconds.inWholeMilliseconds
+                }
                 parameter("limit", limit)
                 parameter("timeout", timeoutSeconds)
                 marker?.let { parameter("marker", it.id) }

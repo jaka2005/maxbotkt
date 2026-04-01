@@ -41,7 +41,7 @@ class WebhookStarter(
                 json(json)
             }
 
-            webhookModule(bot, onUpdate)
+            webhookModule(this, bot, onUpdate)
         }
 
         return scope.launch {
@@ -58,7 +58,7 @@ class WebhookStarter(
 
     }
 
-    fun Application.webhookModule(bot: Bot, onUpdate: suspend Bot.(Update) -> Unit) {
+    fun webhookModule(application: Application, bot: Bot, onUpdate: suspend Bot.(Update) -> Unit) = with(application) {
         publicUrl?.let { url ->
             runBlocking {
                 bot.setWebhook(url, updateTypes, secret)
