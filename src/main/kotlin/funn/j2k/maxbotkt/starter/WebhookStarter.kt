@@ -82,7 +82,8 @@ class WebhookStarter(
                 }
 
                 try {
-                    val update = call.receive<Update>()
+                    val rawUpdate = call.receiveText()
+                    val update = json.decodeFromString<Update>(rawUpdate)
                     bot.onUpdate(update)
                     call.respond(HttpStatusCode.OK)
                 } catch (e: Exception) {
